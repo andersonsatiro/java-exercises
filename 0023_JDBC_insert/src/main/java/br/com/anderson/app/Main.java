@@ -1,16 +1,18 @@
+package br.com.anderson.app;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class CadastrarAluno {
+public class Main {
     public static void main(String[] args) {
 
         Connection connection = null;
         PreparedStatement stmt = null;
 
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost/cadastrar_aluno", "root", "@Admin123");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost/alunos", "root", "@Admin123");
             String sql = "insert into aluno values (?,?,?,?,?,?,?)";
 
             stmt = connection.prepareStatement(sql);
