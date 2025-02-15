@@ -1,45 +1,37 @@
 package br.com.anderson.app;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import br.com.anderson.model.dao.AlunoDAO;
+import br.com.anderson.model.entities.Aluno;
+import br.com.anderson.utils.ScannerUtil;
+
+import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        ScannerUtil scannerUtil = new ScannerUtil(sc);
+        System.out.println("Olá, seja bem-vindo ao sistema de cadastramento de alunos!");
 
-        Connection connection = null;
-        PreparedStatement stmt = null;
+        while(true){
+            System.out.println();
 
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost/alunos", "root", "@Admin123");
-            String sql = "insert into aluno values (?,?,?,?,?,?,?)";
+            Aluno aluno = new Aluno();
+            aluno.setNumero(scannerUtil.requestInteger("Digite o número de identificação do aluno"));
+            aluno.setNome(scannerUtil.requestString("Digite o nome do aluno"));
+            aluno.setCurso(scannerUtil.requestString("Digite o curso do aluno"));
 
-            stmt = connection.prepareStatement(sql);
-            stmt.setInt(1, 10);
-            stmt.setString(2, "Joao Maria");
-            stmt.setString(3, "Informatica");
-            stmt.setDouble(4, 8.7);
-            stmt.setDouble(5, 7.5);
-            stmt.setDouble(6, 9.0);
-            stmt.setDouble(7, 4.4);
-
-            int linhasAfetadas = stmt.executeUpdate();
-
-            if(linhasAfetadas > 0){
-                System.out.println("Aluno cadastrado com sucesso!");
-            } else {
-                System.out.println("Erro ao cadastrar o aluno. Tente novamente.");
+            AlunoDAO alunoDAO = new AlunoDAO();
+            if(alunoDAO.adicionar(aluno)) {
+                System.out.println("Aluno(a) " + aluno.getNome() + " foi cadastrado(a) com sucesso!");
+            }  else {
+                System.out.println("Ocorreu um erro ao cadastrar aluno(a) " + aluno.getNome() + ". Tente novamente!");
             }
-        } catch(SQLException e) {
-            System.err.println("Erro ao cadastrar o aluno. Tente novamente. " + e.getMessage());
-        }  finally {
-            try {
-                if (connection != null) connection.close();
-                if (stmt != null) stmt.close();
-            } catch(SQLException e) {
-                System.err.println("Erro ao fechar a conexao. " + e.getMessage());
-            }
+
+            int option = scannerUtil.requestInteger("\nCaso deseje inserir um novo aluno digite 1. Caso contrário, digite qualquer outro número para finalizar o programa");
+
+            if(option != 1)
+                break;
         }
+        sc.close();
     }
 }
