@@ -19,6 +19,10 @@ public class Main {
             aluno.setNumero(scannerUtil.requestInteger("Digite o número de identificação do aluno"));
             aluno.setNome(scannerUtil.requestString("Digite o nome do aluno"));
             aluno.setCurso(scannerUtil.requestString("Digite o curso do aluno"));
+            aluno.setNota1(scannerUtil.requestDouble("Digite a primeira nota"));
+            aluno.setNota2(scannerUtil.requestDouble("Digite a segunda nota"));
+            aluno.setNota3(scannerUtil.requestDouble("Digite a terceira nota"));
+            aluno.setNota4(scannerUtil.requestDouble("Digite a quarta nota"));
 
             AlunoDAO alunoDAO = new AlunoDAO();
             if(alunoDAO.adicionar(aluno)) {

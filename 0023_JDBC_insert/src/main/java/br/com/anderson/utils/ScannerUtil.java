@@ -22,13 +22,35 @@ public class ScannerUtil {
                     System.out.println();
                     break;
                 } else {
-                    System.out.println("Números negativos não são permitidos. Tente novamente!");
-                    System.out.println();
+                    System.out.println("Números negativos não são permitidos. Tente novamente!\n");
                 }
             }catch(InputMismatchException e) {
                 sc.next();
-                System.out.println("Digite um número inteiro. Tente novamente!");
-                System.out.println();
+                System.out.println("Digite um número inteiro. Tente novamente!\n");
+            }
+        }
+
+        return number;
+    }
+
+    public double requestDouble(String message){
+        double number;
+
+        while(true){
+            try {
+                System.out.print(message + ": ");
+                number = sc.nextDouble();
+                sc.nextLine();
+
+                if(number >= 0) {
+                    System.out.println();
+                    break;
+                } else {
+                    System.out.println("Número negativos não são permitidos. Tente novamente!\n");
+                }
+            } catch(InputMismatchException e){
+                sc.next();
+                System.out.println("Digite um número. Tente novamente!\n");
             }
         }
 
