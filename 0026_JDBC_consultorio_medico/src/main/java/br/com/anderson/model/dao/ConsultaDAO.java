@@ -6,6 +6,7 @@ import br.com.anderson.model.entities.Paciente;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class ConsultaDAO extends AbstractDAO {
     public void cadastrarConsulta(Consulta consulta) {
@@ -21,7 +22,6 @@ public class ConsultaDAO extends AbstractDAO {
 
             success = stmt.executeUpdate() > 0;
         } catch(SQLException e) {
-            System.out.println("Erro: " + e.getMessage());
             success = false;
         }
 
@@ -30,5 +30,43 @@ public class ConsultaDAO extends AbstractDAO {
         } else {
             System.out.println("Erro ao cadastrar consulta. Tente novamente." + "\n");
         }
+    }
+
+    public LocalDateTime horarioConsultaExists(LocalDateTime horario) {
+        String sql = "select horario from consulta where horario = ?";
+        Consulta consulta = new Consulta();
+
+        try(PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setObject(1, horario);
+
+            var resultSet = stmt.executeQuery();
+
+            if(resultSet.next()) {
+                consulta.setHorario(resultSet.getObject("horario", LocalDateTime.class));
+                return consulta.getHorario();
+            } else {
+                return null;
+            }
+        }catch(SQLException e) {
+            return null;
+        }
+    }
+
+    public boolean removerConsulta(Consulta consulta) {
+        boolean success = false;
+        String sql = "delete from consulta where id_medico = ? and id_paciente = ? and horario = ?";
+
+        try(PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, consulta.getMedico().getId());
+            stmt.setInt(2, consulta.getPaciente().getId());
+            stmt.setObject(3, consulta.getHorario());
+
+            success = stmt.executeUpdate() > 0;
+        }catch(SQLException e){
+            System.out.println("Erro: " + e.getMessage());
+            return success;
+        }
+
+        return success;
     }
 }

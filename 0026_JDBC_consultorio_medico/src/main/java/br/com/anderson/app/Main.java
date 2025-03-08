@@ -10,6 +10,7 @@ import br.com.anderson.utils.DateUtil;
 import br.com.anderson.utils.ScannerUtil;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Scanner;
 
 import static br.com.anderson.utils.DateUtil.stringToDate;
@@ -84,7 +85,10 @@ public class Main  {
         consulta.getMedico().setMatricula(scannerUtil.requestInteger("Digite a matrícula do médico"));
         Medico medicoExists = medicoDAO.buscarMedicoByMatricula(consulta.getMedico().getMatricula());
 
-        if(medicoExists.getId() == 0) {
+        if(medicoExists == null) {
+            System.out.println("Ocorreu um erro inesperado. Tente novamente." + "\n");
+            return null;
+        } else if(medicoExists.getId() == 0) {
             System.out.println("Não existe nenhum médico cadastrado com essa matrícula. Altere e tente novamente." + "\n");
             return null;
         }
@@ -93,12 +97,10 @@ public class Main  {
         consulta.getPaciente().setCpf(scannerUtil.requestString("Digite o CPF do paciente"));
         Paciente pacienteExists = pacienteDAO.buscarPacienteByCpf(consulta.getPaciente().getCpf());
 
-        if(medicoExists == null || pacienteExists == null) {
+        if(pacienteExists == null) {
             System.out.println("Ocorreu um erro inesperado. Tente novamente." + "\n");
             return null;
-        }
-
-        if(pacienteExists.getId() == 0) {
+        } else if(pacienteExists.getId() == 0) {
             System.out.println("Não existe nenhum paciente cadastrado com esse CPF. Altere e tente novamenete." + "\n");
             return null;
         }
@@ -112,6 +114,53 @@ public class Main  {
         consulta.getPaciente().setId(pacienteExists.getId());
         consulta.setHorario(horario);
         consulta.setValor(scannerUtil.requestDouble("Digite o valor da consulta"));
+
+        return consulta;
+    }
+
+    public static Consulta permitirRemocaoConsulta(Scanner sc) {
+        ScannerUtil scannerUtil = new ScannerUtil(sc);
+        Consulta consulta = new Consulta(new Medico(), new Paciente());
+
+        MedicoDAO medicoDAO = new MedicoDAO();
+        consulta.getMedico().setMatricula(scannerUtil.requestInteger("Digite a matrícula do médico da consulta"));
+        Medico medicoExists = medicoDAO.buscarMedicoByMatricula(consulta.getMedico().getMatricula());
+
+        if(medicoExists == null) {
+            System.out.println("Ocorreu um erro inesperado. Tente novamente." + "\n");
+            return null;
+        } else if(medicoExists.getId() == 0){
+            System.out.println("Não existe nenhum médico cadastrado com essa matrícula. Altere e tente novamente." + "\n");
+            return null;
+        }
+
+        PacienteDAO pacienteDAO = new PacienteDAO();
+        consulta.getPaciente().setCpf(scannerUtil.requestString("Digite o CPF do paciente da consulta"));
+        Paciente pacienteExists = pacienteDAO.buscarPacienteByCpf(consulta.getPaciente().getCpf());
+
+        if(pacienteExists == null) {
+            System.out.println("Ocorreu um erro inesperado. Tente novamente." + "\n");
+            return null;
+        } else if(pacienteExists.getId() == 0){
+            System.out.println("Não existe nenhum paciente cadastrado com esse CPF. Altere e tente novamente." + "\n");
+            return null;
+        }
+
+        consulta.getMedico().setId(medicoExists.getId());
+        consulta.getPaciente().setId(pacienteExists.getId());
+
+        ConsultaDAO consultaDAO = new ConsultaDAO();
+        consulta.setHorario(
+            stringToDate(
+                scannerUtil.requestString("Digite o horário da consulta (dd/MM/yyyy HH:mm:ss)"), LocalDateTime.class
+            )
+        );
+        LocalDateTime horarioConsultaExists = consultaDAO.horarioConsultaExists(consulta.getHorario());
+
+        if(horarioConsultaExists == null) {
+            System.out.println("Não existe nenhuma consulta cadastrada com esse horário. Altere e tente novamente." + "\n");
+            return null;
+        }
 
         return consulta;
     }
@@ -161,7 +210,17 @@ public class Main  {
                     }
                     break;
                 case 7:
-                    System.out.println("Remover uma consulta cadastrada...");
+                    Consulta consulta = permitirRemocaoConsulta(sc);
+                    if(consulta != null){
+                        boolean consultaRemovida = consultaDAO.removerConsulta(consulta);
+
+                        if(consultaRemovida){
+                            System.out.println("Consulta removida com sucesso!" + "\n");
+                        } else {
+                            System.out.println("Verifique os dados e tente novamente." + "\n");
+                        }
+                    }
+                    break;
                 case 8:
                     System.out.println("Atualizar o horário de uma consulta cadastrada...");
                 case 9:
