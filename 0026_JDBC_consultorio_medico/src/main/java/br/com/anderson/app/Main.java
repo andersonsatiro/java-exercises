@@ -1,7 +1,9 @@
 package br.com.anderson.app;
 
+import br.com.anderson.model.dao.ConsultaDAO;
 import br.com.anderson.model.dao.MedicoDAO;
 import br.com.anderson.model.dao.PacienteDAO;
+import br.com.anderson.model.entities.Consulta;
 import br.com.anderson.model.entities.Medico;
 import br.com.anderson.model.entities.Paciente;
 import br.com.anderson.utils.ScannerUtil;
@@ -43,11 +45,55 @@ public class Main  {
         return paciente;
     }
 
+    public static void medicoExists(Medico medico){
+        if(medico == null) {
+            System.out.println("Erro ao buscar o médico. Tente novamente!" + "\n");
+        } else if(medico.getId() == 0) {
+            System.out.println("Médico não encontrado. Verifique a matrícula e tente novamente." + "\n");
+        } else {
+            System.out.println("Médico encontrado:");
+            System.out.println("Nome: " + medico.getNome());
+            System.out.println("Matrícula: " + medico.getMatricula());
+            System.out.println("Especialidade: " + medico.getEspecialidade());
+            System.out.println("Salário: R$ " + medico.getSalario() + "\n");
+        }
+    }
+
+    public static void pacienteExists(Paciente paciente) {
+        if(paciente == null) {
+            System.out.println("Erro ao buscar o paciente. Tente novamente!" + "\n");
+        } else if(paciente.getId() == 0) {
+            System.out.println("Paciente não encontrado. Verifique o CPF e tente novamente." + "\n");
+        } else {
+            System.out.println("Paciente encontrado:");
+            System.out.println("Nome: " + paciente.getNome());
+            System.out.println("CPF: " + paciente.getCpf());
+            System.out.println("Doença: " + paciente.getDoenca() + "\n");
+        }
+    }
+
+    public static Consulta cadastrarConsulta(Scanner sc) {
+        Consulta consulta = new Consulta();
+        ScannerUtil scannerUtil = new ScannerUtil(sc);
+
+        consulta.getMedico().setMatricula(scannerUtil.requestInteger("Digite a matrícula do médico"));
+        consulta.getPaciente().setCpf(scannerUtil.requestString("Digite o CPF do paciente"));
+        consulta.setHorario(scannerUtil.requestString("Digite o horário da consulta"));
+        consulta.setValor(scannerUtil.requestDouble("Digite o valor da consulta"));
+
+        return consulta;
+    }
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         while(true) {
             exibirMenu();
             ScannerUtil scannerUtil = new ScannerUtil(sc);
+
+            MedicoDAO medicoDAO = new MedicoDAO();
+            PacienteDAO pacienteDAO = new PacienteDAO();
+            ConsultaDAO consultaDAO = new ConsultaDAO();
+
             int option = scannerUtil.requestInteger("Digite aqui");
 
             switch(option) {
@@ -56,19 +102,28 @@ public class Main  {
                     sc.close();
                     System.exit(0);
                 case 2:
-                    MedicoDAO medicoDAO = new MedicoDAO();
                     medicoDAO.cadastrarMedico(cadastrarMedico(sc));
                     break;
                 case 3:
-                    PacienteDAO pacienteDAO = new PacienteDAO();
                     pacienteDAO.cadastrarPaciente(cadastrarPaciente(sc));
                     break;
                 case 4:
-                    System.out.println("Buscando médico por matrícula...");
+                    medicoExists(
+                        medicoDAO.buscarMedicoByMatricula(
+                            scannerUtil.requestInteger("Digite a matrícula do médico")
+                        )
+                    );
+                    break;
                 case 5:
-                    System.out.println("Buscar paciente por CPF...");
+                    pacienteExists(
+                        pacienteDAO.buscarPacienteByCpf(
+                            scannerUtil.requestString("Digite o CPF do paciente")
+                        )
+                    );
+                    break;
                 case 6:
-                    System.out.println("Cadastrar uma nova consulta...");
+                    consultaDAO.cadastrarConsulta(cadastrarConsulta(sc));
+                    break;
                 case 7:
                     System.out.println("Remover uma consulta cadastrada...");
                 case 8:

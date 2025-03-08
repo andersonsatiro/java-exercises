@@ -27,4 +27,28 @@ public class MedicoDAO extends AbstractDAO {
             System.out.println("Erro ao cadastrar médico. Tente novamente!");
         }
     }
+
+    public Medico buscarMedicoByMatricula(int matricula) {
+        Medico medico = new Medico();
+        String sql = "select * from medico where matricula = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, matricula);
+
+            var resultSet = stmt.executeQuery();
+
+            while (resultSet.next()) {
+                medico.setId(resultSet.getInt("id"));
+                medico.setNome(resultSet.getString("nome"));
+                medico.setMatricula(resultSet.getInt("matricula"));
+                medico.setEspecialidade(resultSet.getString("especialidade"));
+                medico.setSalario(resultSet.getDouble("salario"));
+            }
+
+        } catch (SQLException e) {
+            return null;
+        }
+
+        return medico;
+    }
 }

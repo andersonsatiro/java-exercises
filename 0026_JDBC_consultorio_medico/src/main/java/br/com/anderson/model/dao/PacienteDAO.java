@@ -26,4 +26,26 @@ public class PacienteDAO extends AbstractDAO {
             System.out.println("Erro ao cadastrar paciente. Tente novamente!");
         }
     }
+
+    public Paciente buscarPacienteByCpf(String cpf) {
+        Paciente paciente = new Paciente();
+        String sql = "select * from paciente where cpf = ?";
+
+        try(PreparedStatement ptmt = connection.prepareStatement(sql)){
+            ptmt.setString(1, cpf);
+
+            var resultSet = ptmt.executeQuery();
+
+            while(resultSet.next()) {
+                paciente.setId(resultSet.getInt("id"));
+                paciente.setNome(resultSet.getString("nome"));
+                paciente.setCpf(resultSet.getString("cpf"));
+                paciente.setDoenca(resultSet.getString("doenca"));
+            }
+        } catch(SQLException e){
+            return null;
+        }
+
+        return paciente;
+    }
 }
