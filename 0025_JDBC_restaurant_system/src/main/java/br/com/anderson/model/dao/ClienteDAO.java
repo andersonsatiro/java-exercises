@@ -16,17 +16,29 @@ public class ClienteDAO extends AbstractDAO {
             return;
         }
 
-        if(!enderecoDAO.cadastrarEndereco(cliente.getEndereco())) {
-            System.out.println("Ocorreu um erro inesperado ao cadastrar o endereço do cliente. Revise os dados e tente novamente.");
-            return;
-        }
+        int enderecoId = enderecoDAO.cadastrarEndereco(cliente.getEndereco());
+        if(enderecoId < 0) return;
 
         String sql = "insert into cliente (nome, cpf, telefone, email, endereco_id) values (?, ?, ?, ?, ?)";
 
         try(PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, cliente.getNome());
+            stmt.setString(2, cliente.getCpf());
+            stmt.setString(3, cliente.getTelefone());
+            stmt.setString(4, cliente.getEmail());
+            stmt.setInt(5, enderecoId);
+
+            success = stmt.executeUpdate() > 0;
+
+            if(success) {
+                System.out.println("Cliente " + cliente.getNome() + " cadastrado com sucesso!");
+            } else {
+                System.out.println("Erro ao cadastrar o cliente " + cliente.getNome() + ". Verifique os dados e tente novamente.");
+            }
 
         } catch(SQLException e) {
-            success = false;
+            System.out.println("Ocorreu um erro ao cadastrar o cliente: " + e.getMessage());
+            return;
         }
     }
 }

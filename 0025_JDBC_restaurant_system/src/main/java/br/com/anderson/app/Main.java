@@ -1,5 +1,8 @@
 package br.com.anderson.app;
 
+import br.com.anderson.model.dao.ClienteDAO;
+import br.com.anderson.model.entities.Cliente;
+import br.com.anderson.model.entities.Endereco;
 import br.com.anderson.utils.ScannerUtil;
 
 import java.util.Scanner;
@@ -29,10 +32,26 @@ public class Main {
         System.out.println("5 - Voltar");
 
         int option = scannerUtil.requestInteger("Digite aqui");
+        ClienteDAO clienteDAO = new ClienteDAO();
 
         switch(option) {
             case 1:
-                System.out.println("cadastrando cliente...");
+                Cliente cliente = new Cliente();
+                cliente.setNome(scannerUtil.requestString("Digite o nome"));
+                cliente.setCpf(scannerUtil.requestString("Digite o CPF"));
+                cliente.setTelefone(scannerUtil.requestString("Digite o telefone"));
+                cliente.setEmail(scannerUtil.requestString("Digite o e-mail"));
+
+                Endereco endereco = new Endereco();
+                endereco.setPais(scannerUtil.requestString("Digite o país"));
+                endereco.setEstado(scannerUtil.requestString("Digite o estado"));
+                endereco.setCidade(scannerUtil.requestString("Digite a cidade"));
+                endereco.setBairro(scannerUtil.requestString("Digite o bairro"));
+                endereco.setRua(scannerUtil.requestString("Digite a rua"));
+                endereco.setNumero(scannerUtil.requestInteger("Digite o número"));
+                cliente.setEndereco(endereco);
+
+                clienteDAO.cadastrarCliente(cliente);
                 break;
             case 2:
                 System.out.println("buscando cliente...");
@@ -143,3 +162,6 @@ public class Main {
         }
     }
 }
+
+// Permitir que a data de cadastro seja opcional
+// Caso algum erro ocorra, o sistema deve retornar um mensagem e não continuar fluxo do Main
