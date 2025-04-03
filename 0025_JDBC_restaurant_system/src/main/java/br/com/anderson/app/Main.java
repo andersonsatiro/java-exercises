@@ -21,12 +21,34 @@ public class Main {
         System.out.println("0 - Sair\n");
     }
 
-    public static void menuCliente() {
+    public static void menuCliente(Scanner sc, ScannerUtil scannerUtil) {
         System.out.println("1 - Cadastrar cliente");
         System.out.println("2 - Buscar cliente");
         System.out.println("3 - Alterar dados do cliente"); /* Escolher o dado */
         System.out.println("4 - Remover cliente");
         System.out.println("5 - Voltar");
+
+        int option = scannerUtil.requestInteger("Digite aqui");
+
+        switch(option) {
+            case 1:
+                System.out.println("cadastrando cliente...");
+                break;
+            case 2:
+                System.out.println("buscando cliente...");
+                break;
+            case 3:
+                System.out.println("alterando cliente...");
+                break;
+            case 4:
+                System.out.println("removendo cliente...");
+                break;
+            case 5:
+                System.out.println("voltando...");
+                break;
+            default:
+                System.out.println("defaultando...");
+        }
     }
 
     public static void menuFuncionario() {
@@ -93,7 +115,7 @@ public class Main {
 
         switch(option) {
             case 1:
-                menuCliente();
+                menuCliente(sc, scannerUtil);
                 break;
             case 2:
                 menuFuncionario();
