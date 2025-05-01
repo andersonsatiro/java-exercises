@@ -3,21 +3,22 @@ package br.com.anderson.model.dao;
 import br.com.anderson.model.entities.Cliente;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ClienteDAO extends AbstractDAO {
-    private EnderecoDAO enderecoDAO;
+    private EnderecoDAO enderecoDAO = new EnderecoDAO();
 
-    public void cadastrarCliente(Cliente cliente) {
+    public boolean cadastrarCliente(Cliente cliente) {
         boolean success = false;
 
         if(cliente == null) {
             System.out.println("Cliente não pode ser nulo.");
-            return;
+            return false;
         }
 
         int enderecoId = enderecoDAO.cadastrarEndereco(cliente.getEndereco());
-        if(enderecoId < 0) return;
+        if(enderecoId < 0) return false;
 
         String sql = "insert into cliente (nome, cpf, telefone, email, endereco_id) values (?, ?, ?, ?, ?)";
 
@@ -38,7 +39,34 @@ public class ClienteDAO extends AbstractDAO {
 
         } catch(SQLException e) {
             System.out.println("Ocorreu um erro ao cadastrar o cliente: " + e.getMessage());
-            return;
+            success = false;
         }
+
+        return success;
+    }
+
+    public Cliente buscarClienteByCpf(String cpf) {
+        String sql = "select id, nome, email from cliente where cpf = ?";
+        Cliente cliente = new Cliente();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, cpf);
+            ResultSet rs = stmt.executeQuery();
+
+            if(rs.next()) {
+                int id = rs.getInt("id");
+                String nome = rs.getString("nome");
+                String email = rs.getString("email");
+
+                cliente.setId(id);
+                cliente.setNome(nome);
+                cliente.setCpf(cpf);
+                cliente.setEmail(email);
+            }
+        } catch(SQLException e) {
+            System.out.println("Erro ao buscar cliente: " + e.getMessage());
+        }
+
+        return cliente;
     }
 }

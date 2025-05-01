@@ -24,37 +24,23 @@ public class Main {
         System.out.println("0 - Sair\n");
     }
 
-    public static void menuCliente(Scanner sc, ScannerUtil scannerUtil) {
+    public static void menuCliente(ScannerUtil scannerUtil) {
         System.out.println("1 - Cadastrar cliente");
-        System.out.println("2 - Buscar cliente");
+        System.out.println("2 - Buscar cliente por CPF");
         System.out.println("3 - Alterar dados do cliente"); /* Escolher o dado */
         System.out.println("4 - Remover cliente");
         System.out.println("5 - Voltar");
 
         int option = scannerUtil.requestInteger("Digite aqui");
-        ClienteDAO clienteDAO = new ClienteDAO();
 
         switch(option) {
             case 1:
-                Cliente cliente = new Cliente();
-                cliente.setNome(scannerUtil.requestString("Digite o nome"));
-                cliente.setCpf(scannerUtil.requestString("Digite o CPF"));
-                cliente.setTelefone(scannerUtil.requestString("Digite o telefone"));
-                cliente.setEmail(scannerUtil.requestString("Digite o e-mail"));
-
-                Endereco endereco = new Endereco();
-                endereco.setPais(scannerUtil.requestString("Digite o país"));
-                endereco.setEstado(scannerUtil.requestString("Digite o estado"));
-                endereco.setCidade(scannerUtil.requestString("Digite a cidade"));
-                endereco.setBairro(scannerUtil.requestString("Digite o bairro"));
-                endereco.setRua(scannerUtil.requestString("Digite a rua"));
-                endereco.setNumero(scannerUtil.requestInteger("Digite o número"));
-                cliente.setEndereco(endereco);
-
-                clienteDAO.cadastrarCliente(cliente);
+                cadastrarCliente(scannerUtil);
+                menuCliente(scannerUtil);
                 break;
             case 2:
-                System.out.println("buscando cliente...");
+                buscarClienteByCpf(scannerUtil);
+                menuCliente(scannerUtil);
                 break;
             case 3:
                 System.out.println("alterando cliente...");
@@ -125,6 +111,41 @@ public class Main {
         System.out.println("5 - Voltar");
     }
 
+    public static void cadastrarCliente(ScannerUtil scannerUtil) {
+        ClienteDAO clienteDAO = new ClienteDAO();
+
+        Cliente cliente = new Cliente();
+        cliente.setNome(scannerUtil.requestString("Digite o nome"));
+        cliente.setCpf(scannerUtil.requestString("Digite o CPF"));
+        cliente.setTelefone(scannerUtil.requestString("Digite o telefone"));
+        cliente.setEmail(scannerUtil.requestString("Digite o e-mail"));
+
+        Endereco endereco = new Endereco();
+        endereco.setPais(scannerUtil.requestString("Digite o país"));
+        endereco.setEstado(scannerUtil.requestString("Digite o estado"));
+        endereco.setCidade(scannerUtil.requestString("Digite a cidade"));
+        endereco.setBairro(scannerUtil.requestString("Digite o bairro"));
+        endereco.setRua(scannerUtil.requestString("Digite a rua"));
+        endereco.setNumero(scannerUtil.requestInteger("Digite o número"));
+        cliente.setEndereco(endereco);
+
+        clienteDAO.cadastrarCliente(cliente);
+    }
+
+    public static void buscarClienteByCpf(ScannerUtil scanner) {
+        ClienteDAO clienteDAO = new ClienteDAO();
+        String cpf = scanner.requestString("Digite o CPF do cliente");
+        Cliente cliente = clienteDAO.buscarClienteByCpf(cpf);
+
+        if(cliente.getId() > 0) {
+            System.out.println("Cliente " + cliente.getNome() + " encontrado!");
+            System.out.println("CPF: " + cliente.getCpf());
+            System.out.println("E-mail: " + cliente.getEmail() + "\n");
+        } else {
+            System.out.println("Cliente não encontrado. Verifique o CPF e tente novamente.\n");
+        }
+    }
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         ScannerUtil scannerUtil = new ScannerUtil(sc);
@@ -134,7 +155,7 @@ public class Main {
 
         switch(option) {
             case 1:
-                menuCliente(sc, scannerUtil);
+                menuCliente(scannerUtil);
                 break;
             case 2:
                 menuFuncionario();
